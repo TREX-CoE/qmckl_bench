@@ -32,4 +32,5 @@ int main(int argc, char** argv)
   rc = qmckl_trexio_read(context, file_name);
   assert (rc == QMCKL_SUCCESS);
 
+
 }
