@@ -1,4 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
+CFLAGS += -I$(srcdir)/data
 
 bin_PROGRAMS = bench_aos
 

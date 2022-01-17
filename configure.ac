@@ -48,6 +48,7 @@ AS_IF([test "$with_qmckl" = "yes"],
 LIBS="${LIBS} ${QMCKL_LIBS}"
 LDFLAGS="${LIBS} ${QMCKL_LDFLAGS}"
 CFLAGS="${LIBS} ${QMCKL_CFLAGS}"
+AC_DEFINE_UNQUOTED(DATA_DIR, ["`readlink -f ${srcdir}/data`"], [Path to the data files])
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h qmckl.h])
