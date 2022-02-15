@@ -1,0 +1,36 @@
+#+TITLE: Performance tests for QMCkl.
+
+* Installation
+
+1. Download and install QMCkl
+2. Compile the current tests and run
+
+#+begin_src  bash
+./autogen.sh
+./configure
+make
+./bench_jastrow
+#+end_src
+
+* Results
+
+** CPU
+  Intel(R) Xeon(R) CPU E3-1271 v3 @ 3.60GHz, 4cores
+
+** GNU options for QMCkl
+  ~-g -O2 -march=haswell -flto -fno-trapping-math -fno-math-errno -ftree-vectorize~
+
+** Intel options for QMCkl
+  ~-xHost -ip -O2 -ftz -finline -g -mkl=parallel~
+
+** Measures
+  
+| HPC | Compiler | NCores | bench_aos (ms) |
+|-----+----------+--------+----------------|
+| No  | Gnu      |      1 |          146.5 |
+| No  | Gnu      |      4 |          146.3 |
+| Yes | Gnu      |      1 |          117.4 |
+| Yes | Gnu      |      4 |           49.9 |
+| Yes | Intel    |      1 |          109.7 |
+| Yes | Intel    |      4 |           48.7 |
+
