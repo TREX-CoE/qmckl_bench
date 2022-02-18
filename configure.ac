@@ -21,7 +21,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 
 AC_ARG_WITH(qmckl, [AS_HELP_STRING([--with-qmckl],[Specify installation directory of QMCKL])],
-            with_trexio=$withval, with_qmckl=yes)
+            with_qmckl=$withval, with_qmckl=yes)
 
 # Checks for libraries.
 ## BLAS
@@ -32,18 +32,16 @@ AX_LAPACK([], [AC_MSG_ERROR([LAPACK was not found.])])
 
 # Checks for library functions.
 AC_CHECK_LIB([m], [sqrt])
-AS_IF([test "$with_qmckl" = "no"], [AC_MSG_ERROR([QMCkl is required])] )
 AS_IF([test "$with_qmckl" = "yes"],
   [
     AC_CHECK_LIB([qmckl], [qmckl_context_create], [],
       [ AC_MSG_ERROR([QMCKL not found]) ]
     )
   ], [
-    QMCKL_LIBS="-lqmckl"
+    QMCKL_LIBS="${with_qmckl}/lib/libqmckl.a"
     QMCKL_CFLAGS="-I${with_qmckl}/include"
-    QMCKL_LDFLAGS="-L${with_qmckl}/lib"
+    QMCKL_LDFLAGS=""
   ])
-
 
 LIBS="${QMCKL_LIBS} ${LIBS}"
 LDFLAGS="${QMCKL_LDFLAGS} ${LDFLAGS}"

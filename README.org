@@ -18,10 +18,25 @@ make
   Intel(R) Xeon(R) CPU E3-1271 v3 @ 3.60GHz, 4cores
 
 ** GNU options for QMCkl
-  ~-g -O2 -march=haswell -flto -fno-trapping-math -fno-math-errno -ftree-vectorize~
+
+  #+begin_src bash
+./configure \
+    CC=gcc \
+    CFLAGS="-g -O2 -march=native  -flto -fno-trapping-math -fno-math-errno -ftree-vectorize" \
+    FC=gfortran \
+    FCFLAGS="-g -O2 -march=native  -flto -ftree-vectorize" \
+    --enable-hpc --with-openmp
+  #+end_src
+  
 
 ** Intel options for QMCkl
-  ~-xHost -ip -O2 -ftz -finline -g -mkl=parallel~
+
+  #+begin_src bash
+./configure --with-icc --with-ifort --enable-hpc --with-openmp
+
+# -xHost -ip -O2 -ftz -finline -g -mkl=sequential -fopenmp
+  #+end_src
+  
 
 ** Measures
   
@@ -29,8 +44,15 @@ make
 |-----+----------+--------+----------------|
 | No  | Gnu      |      1 |          146.5 |
 | No  | Gnu      |      4 |          146.3 |
-| Yes | Gnu      |      1 |          107.8 |
-| Yes | Gnu      |      4 |           48.8 |
-| Yes | Intel    |      1 |          102.0 |
-| Yes | Intel    |      4 |           48.5 |
+| Yes | Gnu      |      1 |          101.4 |
+| Yes | Gnu      |      4 |           48.1 |
+| Yes | Intel    |      1 |           93.6 |
+| Yes | Intel    |      4 |           48.2 |
 
+** Memo
+
+   Run MAQAO with
+
+   #+begin_src bash
+maqao oneview --create-report=three --output-format=html --force-all-loops --external-libraries={\"libqmckl.so.0\"} ./bench_aos 
+   #+end_src

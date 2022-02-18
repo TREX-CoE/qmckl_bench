@@ -31,7 +31,7 @@ int main(int argc, char** argv)
   const int64_t walk_num = alz_small_walk_num;
 
   printf("Reading %s.\n", file_name);
-  rc = qmckl_trexio_read(context, file_name);
+  rc = qmckl_trexio_read(context, file_name, 255);
   if (rc != QMCKL_SUCCESS) {
     printf("%s\n", qmckl_string_of_error(rc));
   }
@@ -58,8 +58,7 @@ int main(int argc, char** argv)
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
   for (int i=0 ; i<ITERMAX ; ++i) {
-    rc = qmckl_set_electron_coord(context, 'T', alz_small_elec_coord, walk_num*elec_num*3);
-    rc = qmckl_get_ao_basis_ao_vgl(context, ao_vgl, size_max);
+    rc = qmckl_get_ao_basis_ao_vgl_inplace(context, ao_vgl, size_max);
   }
   gettimeofday(&timecheck, NULL);
   end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;

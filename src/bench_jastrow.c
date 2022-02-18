@@ -36,7 +36,7 @@ int main(int argc, char** argv)
   const int64_t walk_num = 1; 
 
   printf("Reading %s.\n", file_name);
-  rc = qmckl_trexio_read(context, file_name);
+  rc = qmckl_trexio_read(context, file_name, 255);
   if (rc != QMCKL_SUCCESS) {
     printf("%s\n", qmckl_string_of_error(rc));
   }
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
   gettimeofday(&timecheck, NULL);
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
   for (int i=0 ; i<ITERMAX ; ++i) {
-    rc = qmckl_set_electron_coord(context, 'T', alz_small_elec_coord, walk_num*elec_num*3);
+    rc = qmckl_context_touch(context);
     rc = qmckl_get_jastrow_factor_een_deriv_e(context, &(factor_een_deriv_e[0][0][0]), walk_num*elec_num*5);
   }
   gettimeofday(&timecheck, NULL);
