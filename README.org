@@ -25,14 +25,14 @@ make
     CFLAGS="-g -O2 -march=native  -flto -fno-trapping-math -fno-math-errno -ftree-vectorize" \
     FC=gfortran \
     FCFLAGS="-g -O2 -march=native  -flto -ftree-vectorize" \
-    --enable-hpc --with-openmp
+    --enable-hpc --with-openmp --enable-static
   #+end_src
   
 
 ** Intel options for QMCkl
 
   #+begin_src bash
-./configure --with-icc --with-ifort --enable-hpc --with-openmp
+./configure --with-icc --with-ifort --enable-hpc --with-openmp --enable-static
 
 # -xHost -ip -O2 -ftz -finline -g -mkl=sequential -fopenmp
   #+end_src
@@ -42,12 +42,12 @@ make
   
 | HPC | Compiler | NCores | bench_aos (ms) |
 |-----+----------+--------+----------------|
-| No  | Gnu      |      1 |          146.5 |
-| No  | Gnu      |      4 |          146.3 |
-| Yes | Gnu      |      1 |          101.4 |
-| Yes | Gnu      |      4 |           48.1 |
-| Yes | Intel    |      1 |           93.6 |
-| Yes | Intel    |      4 |           48.2 |
+| No  | Gnu      |      1 |          132.0 |
+| No  | Gnu      |      4 |          131.6 |
+| Yes | Gnu      |      1 |           76.2 |
+| Yes | Gnu      |      4 |           24.0 |
+| Yes | Intel    |      1 |           69.9 |
+| Yes | Intel    |      4 |           23.7 |
 
 ** Memo
 
