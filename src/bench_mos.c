@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 //  const char* file_name  = h2o_sto_file_name;
 
   printf("Reading %s.\n", file_name);
-  rc = qmckl_trexio_read(context, file_name);
+  rc = qmckl_trexio_read(context, file_name, 255);
   if (rc != QMCKL_SUCCESS) {
     printf("%s\n", qmckl_string_of_error(rc));
   }
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
   assert (rc == QMCKL_SUCCESS);
 
   double* nucl_coord = malloc(nucl_num * 3 * sizeof(double));
-  rc = qmckl_get_nucleus_coord(context, 'T', nucl_coord);
+  rc = qmckl_get_nucleus_coord(context, 'T', nucl_coord, nucl_num*3);
   assert (rc == QMCKL_SUCCESS);
 
   double rmin[3] = { nucl_coord[0], nucl_coord[nucl_num], nucl_coord[2*nucl_num] };
