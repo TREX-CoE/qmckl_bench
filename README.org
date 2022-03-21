@@ -27,7 +27,7 @@ make
     FCFLAGS="-g -O2 -march=native  -flto -ftree-vectorize" \
     --enable-hpc --with-openmp --enable-static
   #+end_src
-  
+
 
 ** Intel options for QMCkl
 
@@ -36,23 +36,23 @@ make
 
 # -xHost -ip -O2 -ftz -finline -g -mkl=sequential -fopenmp
   #+end_src
-  
+
 
 ** Measures
-  
+
 | HPC | Compiler | NCores | bench_aos (ms) |
 |-----+----------+--------+----------------|
 | No  | Gnu      |      1 |          132.0 |
 | No  | Gnu      |      4 |          131.6 |
-| Yes | Gnu      |      1 |           76.2 |
-| Yes | Gnu      |      4 |           24.0 |
-| Yes | Intel    |      1 |           69.9 |
-| Yes | Intel    |      4 |           23.7 |
+| Yes | Gnu      |      1 |           66.9 |
+| Yes | Gnu      |      4 |           24.6 |
+| Yes | Intel    |      1 |           59.9 |
+| Yes | Intel    |      4 |           23.5 |
 
 ** Memo
 
    Run MAQAO with
 
    #+begin_src bash
-maqao oneview --create-report=three --output-format=html --force-all-loops --external-libraries={\"libqmckl.so.0\"} ./bench_aos 
+maqao oneview --create-report=three --output-format=html --force-all-loops --external-libraries={\"libqmckl.so.0\"} ./bench_aos
    #+end_src
