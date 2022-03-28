@@ -112,7 +112,7 @@ int main(int argc, char** argv)
   assert (rc == QMCKL_SUCCESS);
 
   printf("DGEMM MOs\n"); fflush(stdout);
-  rc = qmckl_get_mo_basis_mo_vgl(context, mo_vgl);
+  rc = qmckl_get_mo_basis_mo_vgl(context, mo_vgl, 5*elec_num*mo_num);
   assert (rc == QMCKL_SUCCESS);
 
   double * overlap = malloc(mo_num * mo_num * sizeof(double));
