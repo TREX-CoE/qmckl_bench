@@ -102,31 +102,34 @@ int main(int argc, char** argv)
     }
   }
 
-  int64_t mo_num;
-  rc = qmckl_get_mo_basis_mo_num(context, &mo_num);
+  int64_t ao_num;
+  rc = qmckl_get_ao_basis_ao_num(context, &ao_num);
   assert (rc == QMCKL_SUCCESS);
 
-  const int64_t size_max = 5*point_num*mo_num;
-  double * mo_vgl = malloc (size_max * sizeof(double));
-  assert (mo_vgl != NULL);
+  const int64_t size_max = 5*point_num*ao_num;
+  double * ao_vgl = malloc (size_max * sizeof(double));
+  assert (ao_vgl != NULL);
 
 
-  rc = qmckl_set_point(context, 'N', coord, point_num);
+  rc = qmckl_set_electron_walk_num(context, point_num);
+  rc = qmckl_set_electron_num(context, 1L, 0L);
+  rc = qmckl_set_electron_coord(context, 'N', coord, 3*point_num);
+  //rc = qmckl_set_point(context, 'N', coord, point_num);
   assert (rc == QMCKL_SUCCESS);
 
-  printf("DGEMM MOs\n"); fflush(stdout);
-  rc = qmckl_get_mo_basis_mo_vgl(context, mo_vgl, 5*point_num*mo_num);
+  printf("DGEMM AOs\n"); fflush(stdout);
+  rc = qmckl_get_ao_basis_ao_vgl(context, ao_vgl, 5*point_num*ao_num);
   assert (rc == QMCKL_SUCCESS);
 
-  double * overlap = malloc(mo_num * mo_num * sizeof(double));
+  double * overlap = malloc(ao_num * ao_num * sizeof(double));
 
   printf("DGEMM grid\n"); fflush(stdout);
-  rc = qmckl_dgemm(context, 'N', 'T', mo_num, mo_num, point_num, dx*dy*dz,
-                   mo_vgl, mo_num*5, mo_vgl, mo_num*5, 0.0, overlap, mo_num);
+  rc = qmckl_dgemm(context, 'N', 'T', ao_num, ao_num, point_num, dx*dy*dz,
+                   ao_vgl, ao_num*5, ao_vgl, ao_num*5, 0.0, overlap, ao_num);
 
-  for (int j=0 ; j<mo_num ; ++j) {
-    for (int i=0 ; i<mo_num ; ++i) {
-      printf("%d %d %f\n", i, j, overlap[i + j*mo_num]);
+  for (int j=0 ; j<ao_num ; ++j) {
+    for (int i=0 ; i<ao_num ; ++i) {
+      printf("%d %d %f\n", i, j, overlap[i + j*ao_num]);
     }
   }
 
