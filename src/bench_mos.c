@@ -2,7 +2,8 @@
 #include "config.h"
 #endif
 
-#include "qmckl.h"
+#include <qmckl.h>
+#include <trexio.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,8 +11,6 @@
 #include <assert.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include "Alz_small.h"
-#include "h2o-sto3g.h"
 
 #include <time.h>
 
@@ -26,9 +25,22 @@ int main(int argc, char** argv)
   context = qmckl_context_create();
   qmckl_exit_code rc;
 
-  const char* file_name  = alz_small_file_name;
-  const int64_t elec_num = alz_small_elec_num;
-  const int64_t walk_num = alz_small_walk_num;
+  if (argc < 2) {
+    fprintf(stderr,"Syntax: %s FILE.    (FILEs are data/*.h5)\n", argv[0]);
+    exit(-1);
+  }
+  char* file_name = argv[1];
+  trexio_t* trexio_file = trexio_open(file_name, 'r', TREXIO_HDF5, &rc);
+  assert (rc == TREXIO_SUCCESS);
+
+  int walk_num, elec_num;
+  rc = trexio_read_qmc_num(trexio_file, &walk_num);
+  assert (rc == TREXIO_SUCCESS);
+  rc = trexio_read_electron_num(trexio_file, &elec_num);
+  assert (rc == TREXIO_SUCCESS);
+  double* elec_coord = malloc(sizeof(double)*walk_num*elec_num*3);
+  assert (elec_coord != NULL);
+  trexio_close(trexio_file);
 
   printf("Reading %s.\n", file_name);
   rc = qmckl_trexio_read(context, file_name, 255);
@@ -48,7 +60,7 @@ int main(int argc, char** argv)
   double * mo_vgl = malloc (size_max * sizeof(double));
   assert (mo_vgl != NULL);
 
-  rc = qmckl_set_electron_coord(context, 'T', alz_small_elec_coord, walk_num*elec_num*3);
+  rc = qmckl_set_electron_coord(context, 'T', elec_coord, walk_num*elec_num*3);
   assert (rc == QMCKL_SUCCESS);
 
   rc = qmckl_get_mo_basis_mo_vgl(context, mo_vgl, size_max);

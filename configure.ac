@@ -32,6 +32,9 @@ AX_LAPACK([], [AC_MSG_ERROR([LAPACK was not found.])])
 
 # Checks for library functions.
 AC_CHECK_LIB([m], [sqrt])
+AC_CHECK_LIB([trexio], [trexio_open], [],
+      [ AC_MSG_ERROR([TREXIO not found]) ])
+
 AS_IF([test "$with_qmckl" = "yes"],
   [
     AC_CHECK_LIB([qmckl], [qmckl_context_create], [],

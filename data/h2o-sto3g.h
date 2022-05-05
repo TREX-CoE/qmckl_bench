@@ -1,10 +1,10 @@
-#ifndef H2o_STO
-#define H2o_STO
-const char*   h2o_sto_file_name = DATA_DIR "/h2o-sto3g.h5";
-const int64_t h2o_sto_walk_num  = 100;
-const int64_t h2o_sto_elec_num  = 10;
+#ifndef H2O_STO
+#define H2O_STO
+const char*   file_name = DATA_DIR "/h2o-sto3g.h5";
+const int64_t walk_num  = 100;
+const int64_t elec_num  = 10;
 
-double h2o_sto_elec_coord[100*3*10] = {
+double elec_coord[100*3*10] = {
    2.779658138750000e-02,
    1.162505507470000e+00,
   -1.986875057220000e+00,

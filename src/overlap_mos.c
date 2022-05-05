@@ -8,8 +8,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
-#include "Alz_small.h"
-#include "h2o-sto3g.h"
+#include "Alz_large.h"
 
 #include <time.h>
 
@@ -23,8 +22,6 @@ int main(int argc, char** argv)
   qmckl_context context;
   context = qmckl_context_create();
   qmckl_exit_code rc;
-
-  const char* file_name  = alz_small_file_name;
 
   printf("Reading %s.\n", file_name);
   rc = qmckl_trexio_read(context, file_name, 255);
