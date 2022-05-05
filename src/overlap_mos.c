@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
-#include "Alz_large.h"
 
 #include <time.h>
 
@@ -23,6 +22,12 @@ int main(int argc, char** argv)
   context = qmckl_context_create();
   qmckl_exit_code rc;
 
+  if (argc < 2) {
+    fprintf(stderr,"Syntax: %s FILE.    (FILEs are data/*.h5)\n", argv[0]);
+    exit(-1);
+  }
+  char* file_name = argv[1];
+
   printf("Reading %s.\n", file_name);
   rc = qmckl_trexio_read(context, file_name, 255);
   if (rc != QMCKL_SUCCESS) {
@@ -35,13 +40,7 @@ int main(int argc, char** argv)
   const int64_t nz = 40;
   const int64_t np = nx*ny*nz;
 
-  const int64_t elec_num = np;
-
-  rc = qmckl_set_electron_walk_num(context, 1L);
-  assert (rc == QMCKL_SUCCESS);
-
-  rc = qmckl_set_electron_num(context, np/2, np/2);
-  assert (rc == QMCKL_SUCCESS);
+  const int64_t point_num = np;
 
   int64_t nucl_num;
   rc = qmckl_get_nucleus_num(context, &nucl_num);
@@ -98,24 +97,24 @@ int main(int argc, char** argv)
   rc = qmckl_get_mo_basis_mo_num(context, &mo_num);
   assert (rc == QMCKL_SUCCESS);
 
-  const int64_t size_max = 5*elec_num*mo_num;
+  const int64_t size_max = 5*point_num*mo_num;
   double * mo_vgl = malloc (size_max * sizeof(double));
   assert (mo_vgl != NULL);
 
 
   printf("%e %e %e  %e\n", coord[0], coord[1], coord[2], mo_vgl[0]);
-  printf("Setting electron coordinates\n"); fflush(stdout);
-  rc = qmckl_set_electron_coord(context, 'N', coord, elec_num*3);
+  printf("Setting coordinates\n"); fflush(stdout);
+  rc = qmckl_set_point(context, 'N', coord, point_num);
   assert (rc == QMCKL_SUCCESS);
 
   printf("DGEMM MOs\n"); fflush(stdout);
-  rc = qmckl_get_mo_basis_mo_vgl(context, mo_vgl, 5*elec_num*mo_num);
+  rc = qmckl_get_mo_basis_mo_vgl(context, mo_vgl, 5*point_num*mo_num);
   assert (rc == QMCKL_SUCCESS);
 
   double * overlap = malloc(mo_num * mo_num * sizeof(double));
 
   printf("DGEMM grid\n"); fflush(stdout);
-  rc = qmckl_dgemm(context, 'N', 'T', mo_num, mo_num, elec_num, dx*dy*dz,
+  rc = qmckl_dgemm(context, 'N', 'T', mo_num, mo_num, point_num, dx*dy*dz,
                    mo_vgl, mo_num, mo_vgl, mo_num, 0.0, overlap, mo_num);
 
   for (int j=0 ; j<mo_num ; ++j) {
