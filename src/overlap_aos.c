@@ -111,10 +111,7 @@ int main(int argc, char** argv)
   assert (ao_vgl != NULL);
 
 
-  rc = qmckl_set_electron_walk_num(context, point_num);
-  rc = qmckl_set_electron_num(context, 1L, 0L);
-  rc = qmckl_set_electron_coord(context, 'N', coord, 3*point_num);
-  //rc = qmckl_set_point(context, 'N', coord, point_num);
+  rc = qmckl_set_point(context, 'N', point_num, coord, 3*point_num);
   assert (rc == QMCKL_SUCCESS);
 
   printf("DGEMM AOs\n"); fflush(stdout);

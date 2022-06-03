@@ -27,6 +27,18 @@ int main(int argc, char** argv)
     exit(-1);
   }
   char* file_name = argv[1];
+  int nx, ny, nz;
+  nx = 80;
+  if (argc > 2)
+    sscanf(argv[2], "%d", &nx);
+  ny = nx;
+  nz = nx;
+  if (argc > 3)
+    sscanf(argv[3], "%d", &ny);
+  if (argc > 4)
+    sscanf(argv[4], "%d", &nz);
+
+  printf("nx = %d  ny = %d  nz = %d\n", nx, ny, nz);
 
   printf("Reading %s.\n", file_name);
   rc = qmckl_trexio_read(context, file_name, 255);
@@ -35,12 +47,8 @@ int main(int argc, char** argv)
   }
   assert (rc == QMCKL_SUCCESS);
 
-  const int64_t nx = 80;
-  const int64_t ny = 80;
-  const int64_t nz = 80;
   const int64_t np = nx*ny*nz;
-
-  const int64_t point_num = np;
+  const int64_t point_num = nx*ny;
 
   int64_t nucl_num;
   rc = qmckl_get_nucleus_num(context, &nucl_num);
@@ -86,10 +94,22 @@ int main(int argc, char** argv)
   printf("%f %f %f \n", dx, dy, dz);
   printf("\n");
 
-  double * coord = malloc ( np * 3 * sizeof(double));
+  double * coord = malloc ( point_num * 3 * sizeof(double));
   double x, y, z;
-  double *p = coord;
+
+  int64_t mo_num;
+  rc = qmckl_get_mo_basis_mo_num(context, &mo_num);
+  assert (rc == QMCKL_SUCCESS);
+
+  const int64_t size_max = 5*point_num*mo_num;
+  double * mo_vgl = malloc (size_max * sizeof(double));
+  assert (mo_vgl != NULL);
+
+  double * overlap = calloc(mo_num * mo_num, sizeof(double));
+  assert (overlap != NULL);
+
   for (int64_t iz=0 ; iz<nz ; iz++) {
+    double *p = coord;
     z = rmin[2] + iz * dz;
     for (int64_t iy=0 ; iy<ny ; iy++) {
       y = rmin[1] + iy * dy;
@@ -100,34 +120,38 @@ int main(int argc, char** argv)
         *p = z; ++p;
       }
     }
+
+    rc = qmckl_set_point(context, 'N', point_num, coord, 3*point_num);
+    assert (rc == QMCKL_SUCCESS);
+
+    printf("."); fflush(stdout);
+    rc = qmckl_get_mo_basis_mo_vgl(context, mo_vgl, 5*point_num*mo_num);
+    assert (rc == QMCKL_SUCCESS);
+
+    rc = qmckl_dgemm(context, 'N', 'T', mo_num, mo_num, point_num, dx*dy*dz,
+                    mo_vgl, mo_num*5, mo_vgl, mo_num*5, 1.0, overlap, mo_num);
   }
+  printf("\n\n"); 
 
-  int64_t mo_num;
-  rc = qmckl_get_mo_basis_mo_num(context, &mo_num);
-  assert (rc == QMCKL_SUCCESS);
-
-  const int64_t size_max = 5*point_num*mo_num;
-  double * mo_vgl = malloc (size_max * sizeof(double));
-  assert (mo_vgl != NULL);
-
-
-  rc = qmckl_set_point(context, 'N', coord, point_num);
-  assert (rc == QMCKL_SUCCESS);
-
-  printf("DGEMM MOs\n"); fflush(stdout);
-  rc = qmckl_get_mo_basis_mo_vgl(context, mo_vgl, 5*point_num*mo_num);
-  assert (rc == QMCKL_SUCCESS);
-
-  double * overlap = malloc(mo_num * mo_num * sizeof(double));
-
-  printf("DGEMM grid\n"); fflush(stdout);
-  rc = qmckl_dgemm(context, 'N', 'T', mo_num, mo_num, point_num, dx*dy*dz,
-                   mo_vgl, mo_num*5, mo_vgl, mo_num*5, 0.0, overlap, mo_num);
-
+  double error = 0.;
   for (int j=0 ; j<mo_num ; ++j) {
+    for (int i=0 ; i<j ; ++i) {
+      const double x = overlap[i + j*mo_num];
+      error += x*x;
+    }
+    const double x = overlap[j + j*mo_num] - 1.;
+    error += x*x;
+    for (int i=j+1 ; i<mo_num ; ++i) {
+      const double x = overlap[i + j*mo_num];
+      error += x*x;
+    }
     for (int i=0 ; i<mo_num ; ++i) {
       printf("%d %d %f\n", i, j, overlap[i + j*mo_num]);
     }
   }
+  error = sqrt(error);
+  printf("\nError: %e\n", error);
+
+
 
 }

@@ -77,5 +77,16 @@ int main(int argc, char** argv)
 
   printf("Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
 
+  gettimeofday(&timecheck, NULL);
+  start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
+
+  for (int i=0 ; i<ITERMAX ; ++i) {
+    rc = qmckl_get_ao_basis_ao_value_inplace(context, ao_vgl, size_max);
+  }
+  gettimeofday(&timecheck, NULL);
+  end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
+
+  printf("Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
+
 
 }
