@@ -67,5 +67,5 @@ make
    Run MAQAO with
 
    #+begin_src bash
-maqao oneview --create-report=three --output-format=html --force-all-loops --external-libraries={\"libqmckl.so.0\"} ./bench_aos
+maqao oneview --create-report=three --output-format=html --force-all-loops --external-libraries={\"libqmckl.so.0\"} -- ./bench_aos data/Alz_small.h5
    #+end_src
