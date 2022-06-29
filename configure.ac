@@ -16,7 +16,7 @@ AM_MAINTAINER_MODE()
 AC_LANG(C)
 AC_PROG_F77
 AC_PROG_CC
-AC_PROG_CC_C_O
+AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_LN_S
 
@@ -25,10 +25,10 @@ AC_ARG_WITH(qmckl, [AS_HELP_STRING([--with-qmckl],[Specify installation director
 
 # Checks for libraries.
 ## BLAS
-AX_BLAS([], [AC_MSG_ERROR([BLAS was not found.])])
+#AX_BLAS([], [AC_MSG_ERROR([BLAS was not found.])])
 
 ## LAPACK
-AX_LAPACK([], [AC_MSG_ERROR([LAPACK was not found.])])
+#AX_LAPACK([], [AC_MSG_ERROR([LAPACK was not found.])])
 
 # Checks for library functions.
 AC_CHECK_LIB([m], [sqrt])
