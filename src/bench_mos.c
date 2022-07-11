@@ -80,6 +80,7 @@ int main(int argc, char** argv)
   gettimeofday(&timecheck, NULL);
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
+  rc = qmckl_get_mo_basis_mo_value(context, mo_vgl, size_max);
   for (int i=0 ; i<ITERMAX ; ++i) {
     rc = qmckl_get_mo_basis_mo_value_inplace(context, mo_vgl, size_max);
   }
