@@ -71,23 +71,57 @@ int main(int argc, char** argv)
 
   for (int i=0 ; i<ITERMAX ; ++i) {
     rc = qmckl_get_mo_basis_mo_vgl_inplace(context, mo_vgl, size_max);
+    assert (rc == QMCKL_SUCCESS);
   }
   gettimeofday(&timecheck, NULL);
   end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
   printf("Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
+
+  rc = qmckl_context_destroy(context);
+  assert (rc == QMCKL_SUCCESS);
+
+
+  context = qmckl_context_create();
+
+  printf("Reading %s.\n", file_name);
+  rc = qmckl_trexio_read(context, file_name, 255);
+  if (rc != QMCKL_SUCCESS) {
+    printf("%s\n", qmckl_string_of_error(rc));
+  }
+  assert (rc == QMCKL_SUCCESS);
+
+  rc = qmckl_set_electron_walk_num(context, walk_num);
+  assert (rc == QMCKL_SUCCESS);
+
+  const int64_t size_max_v = walk_num*elec_num*mo_num;
+  double * mo_v = malloc (size_max_v * sizeof(double));
+  assert (mo_v != NULL);
+
+  rc = qmckl_set_electron_coord(context, 'T', elec_coord, walk_num*elec_num*3);
+  assert (rc == QMCKL_SUCCESS);
+
+  rc = qmckl_get_mo_basis_mo_value(context, mo_v, size_max);
+  assert (rc == QMCKL_SUCCESS);
 
   gettimeofday(&timecheck, NULL);
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
-  rc = qmckl_get_mo_basis_mo_value(context, mo_vgl, size_max);
   for (int i=0 ; i<ITERMAX ; ++i) {
-    rc = qmckl_get_mo_basis_mo_value_inplace(context, mo_vgl, size_max);
+    rc = qmckl_get_mo_basis_mo_value_inplace(context, mo_v, size_max);
+    assert (rc == QMCKL_SUCCESS);
   }
+
   gettimeofday(&timecheck, NULL);
   end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
   printf("Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
 
+  rc = qmckl_context_destroy(context);
+  assert (rc == QMCKL_SUCCESS);
+
+  free(mo_vgl);
+  free(mo_v);
+  free(elec_coord);
 
 }
