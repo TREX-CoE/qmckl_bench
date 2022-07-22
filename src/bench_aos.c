@@ -71,7 +71,9 @@ int main(int argc, char** argv)
 
   for (int i=0 ; i<ITERMAX ; ++i) {
     rc = qmckl_get_ao_basis_ao_vgl_inplace(context, ao_vgl, size_max);
+    assert (rc == QMCKL_SUCCESS);
   }
+  
   gettimeofday(&timecheck, NULL);
   end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
@@ -101,15 +103,17 @@ int main(int argc, char** argv)
   double * ao_v = malloc (size_max_v * sizeof(double));
   assert (ao_v != NULL);
 
+  rc = qmckl_get_ao_basis_ao_value(context, ao_v, size_max_v);
+  assert (rc == QMCKL_SUCCESS);
+  
   gettimeofday(&timecheck, NULL);
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
-  rc = qmckl_get_ao_basis_ao_value(context, ao_v, size_max_v);
-  assert (rc == QMCKL_SUCCESS);
-
   for (int i=0 ; i<ITERMAX ; ++i) {
     rc = qmckl_get_ao_basis_ao_value_inplace(context, ao_v, size_max_v);
+    assert (rc == QMCKL_SUCCESS);
   }
+
   gettimeofday(&timecheck, NULL);
   end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
