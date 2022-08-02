@@ -15,9 +15,6 @@
 
 int main(int argc, char** argv)
 {
-  clock_t start, end;
-  double cpu_time_used;
-
   qmckl_context context;
   context = qmckl_context_create();
   qmckl_exit_code rc;
@@ -47,7 +44,6 @@ int main(int argc, char** argv)
   }
   assert (rc == QMCKL_SUCCESS);
 
-  const int64_t np = nx*ny*nz;
   const int64_t point_num = nx*ny;
 
   int64_t nucl_num;

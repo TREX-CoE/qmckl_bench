@@ -117,8 +117,6 @@ int main(int argc, char** argv)
   assert(rc == QMCKL_SUCCESS);
 
 
-  double * x;
-
   double factor_een_deriv_e[walk_num][5][elec_num];
 
   gettimeofday(&timecheck, NULL);
