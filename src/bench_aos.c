@@ -34,12 +34,14 @@ int main(int argc, char** argv)
   assert (rc == TREXIO_SUCCESS);
 
   int walk_num, elec_num;
-  rc = trexio_read_qmc_num(trexio_file, &walk_num);
-  assert (rc == TREXIO_SUCCESS);
   rc = trexio_read_electron_num(trexio_file, &elec_num);
+  assert (rc == TREXIO_SUCCESS);
+  rc = trexio_read_qmc_num(trexio_file, &walk_num);
   assert (rc == TREXIO_SUCCESS);
   double* elec_coord = malloc(sizeof(double)*walk_num*elec_num*3);
   assert (elec_coord != NULL);
+  rc = trexio_read_qmc_point(trexio_file, elec_coord);
+  assert (rc == TREXIO_SUCCESS);
   trexio_close(trexio_file);
 
   printf("Reading %s.\n", file_name);
@@ -47,9 +49,6 @@ int main(int argc, char** argv)
   if (rc != QMCKL_SUCCESS) {
     printf("%s\n", qmckl_string_of_error(rc));
   }
-  assert (rc == QMCKL_SUCCESS);
-
-  rc = qmckl_set_electron_walk_num(context, walk_num);
   assert (rc == QMCKL_SUCCESS);
 
   int64_t ao_num;
@@ -60,7 +59,7 @@ int main(int argc, char** argv)
   double * ao_vgl = malloc (size_max * sizeof(double));
   assert (ao_vgl != NULL);
 
-  rc = qmckl_set_electron_coord(context, 'T', elec_coord, walk_num*elec_num*3);
+  rc = qmckl_set_electron_coord(context, 'N', walk_num, elec_coord, walk_num*elec_num*3);
   assert (rc == QMCKL_SUCCESS);
 
   rc = qmckl_get_ao_basis_ao_vgl(context, ao_vgl, size_max);
