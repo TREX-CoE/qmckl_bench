@@ -21,6 +21,8 @@ const double jast_coef[11080] = {
 };
 
 
+
+
 int main(int argc, char** argv)
 {
   long start, end;
@@ -90,6 +92,8 @@ int main(int argc, char** argv)
   rc = qmckl_get_nucleus_num(context, &nucl_num);
 
   assert(rc == QMCKL_SUCCESS);
+
+  qmckl_init_jastrow(context);
 
   rc = qmckl_set_jastrow_ord_num(context, aord_num, bord_num, cord_num);
   assert(rc == QMCKL_SUCCESS);
