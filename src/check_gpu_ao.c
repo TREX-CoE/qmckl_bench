@@ -20,7 +20,7 @@
 #define DEVICE_ID 0
 
 int main(int argc, char** argv)
-
+{
 
 	qmckl_context context;
 	context = qmckl_context_create();
@@ -59,6 +59,7 @@ int main(int argc, char** argv)
 
 	printf("Reading %s.\n", file_name);
 	rc = qmckl_trexio_read_device(context, file_name, 255, DEVICE_ID);
+	printf("fin read\n");
 	if (rc != QMCKL_SUCCESS) {
 		printf("%s\n", qmckl_string_of_error(rc));
 	}
@@ -77,7 +78,9 @@ int main(int argc, char** argv)
 	rc = qmckl_set_electron_coord_device(context, 'N', walk_num, elec_coord_device, walk_num*elec_num*3, DEVICE_ID);
 	assert (rc == QMCKL_SUCCESS);
 
+	printf("Va y le GPU fonce\n");
 	rc = qmckl_get_ao_basis_ao_vgl_device(context, ao_vgl_device, size_max, DEVICE_ID);
+	printf("fin le GPU\n");
 	assert (rc == QMCKL_SUCCESS);
 
 	omp_target_memcpy(
@@ -86,22 +89,29 @@ int main(int argc, char** argv)
 			0, 0,
 			omp_get_initial_device, DEVICE_ID);
 
-	qmckl_context_touch(context);
 
-	free(elec_coord);
-	omp_target_free(elec_coord_device);
+	omp_target_free(elec_coord_device, DEVICE_ID);
+
+	qmckl_context_destroy(context);
+
+	printf("debut CPU\n");
+
+	context = qmckl_context_create();
 
 
+	printf("Reading %s.\n", file_name);
+	rc = qmckl_trexio_read(context, file_name, 255);
+	if (rc != QMCKL_SUCCESS) {
+		printf("%s\n", qmckl_string_of_error(rc));
+	}
+	assert (rc == QMCKL_SUCCESS);
 
-
- 	double* elec_coord = malloc(sizeof(double)*walk_num*elec_num*3);
 	
 
 	int64_t ao_num_CPU;
 	rc = qmckl_get_ao_basis_ao_num(context, &ao_num);
 	assert (rc == QMCKL_SUCCESS);
 
-	const int64_t size_max = 5*walk_num*elec_num*ao_num;
 	double * ao_vgl_CPU = malloc (size_max * sizeof(double));
 	assert (ao_vgl_CPU != NULL);
 
@@ -116,10 +126,14 @@ int main(int argc, char** argv)
 	//
 	
 	for(int i = 0; i < size_max; i++){
-		if(ao_vgl[i] != ao_vgl_device_return[i]){
+		if(ao_vgl_CPU[i] != ao_vgl_device_return[i]){
 			printf("Fail test");
 			return 0;
 		}
 	}
+
+	free(elec_coord);
+	omp_target_free(elec_coord_device, DEVICE_ID);
+
 
 }

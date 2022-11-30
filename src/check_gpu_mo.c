@@ -15,6 +15,7 @@
 #include <time.h>
 
 #define ITERMAX 10
+#define DEVICE_ID 0
 
 int main(int argc, char** argv)
 {
@@ -67,7 +68,6 @@ trexio_close(trexio_file);
 
 
 
-	free(elec_coord);
 
 
 	//GPU part
@@ -75,7 +75,6 @@ trexio_close(trexio_file);
 
 
 
-	double* elec_coord = malloc(sizeof(double)*walk_num*elec_num*3);
 	double* elec_coord_device = omp_target_alloc(sizeof(double)*walk_num*elec_num*3, DEVICE_ID);
 
 	assert (elec_coord != NULL);
