@@ -13,6 +13,7 @@
 #include <sys/time.h>
 
 #include <omp.h>
+#include <openacc.h>
 
 #include <time.h>
 
@@ -43,19 +44,16 @@ int main(int argc, char** argv)
 
 
 	double* elec_coord = malloc(sizeof(double)*walk_num*elec_num*3);
-	double* elec_coord_device = omp_target_alloc(sizeof(double)*walk_num*elec_num*3, DEVICE_ID);
+	double* elec_coord_device = acc_malloc(sizeof(double)*walk_num*elec_num*3);
 
 	assert (elec_coord != NULL);
 	rc = trexio_read_qmc_point(trexio_file, elec_coord);
 	assert (rc == TREXIO_SUCCESS);
 	trexio_close(trexio_file);
 
-	omp_target_memcpy(
+	acc_memcpy_to_device(
 			elec_coord_device, elec_coord,
-			sizeof(double)*walk_num*elec_num*3,
-			0, 0,
-			DEVICE_ID, omp_get_initial_device()
-			);
+			sizeof(double)*walk_num*elec_num*3);
 
 
 	printf("Reading %s.\n", file_name);
@@ -70,7 +68,7 @@ int main(int argc, char** argv)
 	assert (rc == QMCKL_SUCCESS);
 
 	const int64_t size_max = 5*walk_num*elec_num*mo_num;
-	double* mo_vgl = omp_target_alloc(size_max * sizeof(double), DEVICE_ID);
+	double* mo_vgl = acc_malloc(size_max * sizeof(double));
 	assert (mo_vgl != NULL);
 
 	rc = qmckl_set_electron_coord_device(context, 'N', walk_num, elec_coord_device, walk_num*elec_num*3, DEVICE_ID);

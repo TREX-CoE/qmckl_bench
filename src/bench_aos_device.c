@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#include <omp.h>
+#include <openacc.h>
 
 #include <time.h>
 
@@ -44,18 +44,16 @@ int main(int argc, char** argv)
 
 
   double* elec_coord = malloc(sizeof(double)*walk_num*elec_num*3);
-  double* elec_coord_device = omp_target_alloc(sizeof(double)*walk_num*elec_num*3, DEVICE_ID);
+  double* elec_coord_device = acc_malloc(sizeof(double)*walk_num*elec_num*3);
 
   assert (elec_coord != NULL);
   rc = trexio_read_qmc_point(trexio_file, elec_coord);
   assert (rc == TREXIO_SUCCESS);
   trexio_close(trexio_file);
 
-  omp_target_memcpy(
+  acc_memcpy_to_device(
     elec_coord_device, elec_coord,
-    sizeof(double)*walk_num*elec_num*3,
-    0, 0,
-    DEVICE_ID, omp_get_initial_device()
+    sizeof(double)*walk_num*elec_num*3
   );
 
   printf("Reading %s.\n", file_name);
@@ -70,7 +68,7 @@ int main(int argc, char** argv)
   assert (rc == QMCKL_SUCCESS);
 
   const int64_t size_max = 5*walk_num*elec_num*ao_num;
-  double * ao_vgl_device = omp_target_alloc (size_max * sizeof(double), DEVICE_ID);
+  double * ao_vgl_device = acc_malloc (size_max * sizeof(double));
   assert (ao_vgl_device != NULL);
 
 
@@ -95,7 +93,7 @@ int main(int argc, char** argv)
   printf("Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
 
   free(elec_coord);
-  omp_target_free(elec_coord_device, DEVICE_ID);
-  omp_target_free(ao_vgl_device, DEVICE_ID);
+  acc_free(elec_coord_device);
+  acc_free(ao_vgl_device);
 
 }
