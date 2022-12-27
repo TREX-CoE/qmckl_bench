@@ -56,16 +56,19 @@ int main(int argc, char** argv)
     sizeof(double)*walk_num*elec_num*3
   );
 
+  printf("%p\n", elec_coord_device);
   printf("Reading %s.\n", file_name);
   rc = qmckl_trexio_read_device(context, file_name, 255, DEVICE_ID);
   if (rc != QMCKL_SUCCESS) {
     printf("%s\n", qmckl_string_of_error(rc));
   }
   assert (rc == QMCKL_SUCCESS);
+  printf("ok read device\n");
 
   int64_t ao_num;
   rc = qmckl_get_ao_basis_ao_num(context, &ao_num);
   assert (rc == QMCKL_SUCCESS);
+  printf("ok lecture ao basis ao num\n");
 
   const int64_t size_max = 5*walk_num*elec_num*ao_num;
   double * ao_vgl_device = acc_malloc (size_max * sizeof(double));
@@ -74,10 +77,12 @@ int main(int argc, char** argv)
 
   rc = qmckl_set_electron_coord_device(context, 'N', walk_num, elec_coord_device, walk_num*elec_num*3, DEVICE_ID);
   assert (rc == QMCKL_SUCCESS);
+  printf("of set electron coord\n");
 
   rc = qmckl_get_ao_basis_ao_vgl_device(context, ao_vgl_device, size_max, DEVICE_ID);
   assert (rc == QMCKL_SUCCESS);
 
+  printf("ok set ai basis vgl\n");
   qmckl_context_touch(context);
 
   gettimeofday(&timecheck, NULL);
