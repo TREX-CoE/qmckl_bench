@@ -18,7 +18,7 @@
 
 #include <time.h>
 
-#define ITERMAX 10
+#define ITERMAX 5
 #define DEVICE_ID 0
 
 int main(int argc, char** argv)
@@ -57,8 +57,7 @@ int main(int argc, char** argv)
     elec_coord_device, elec_coord,
     sizeof(double)*walk_num*elec_num*3,
     0, 0,
-    //DEVICE_ID, omp_get_initial_device()
-    DEVICE_ID, -1
+    DEVICE_ID, omp_get_initial_device()
   );
 
   printf("Reading %s.\n", file_name);
