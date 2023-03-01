@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 
 	printf("Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
 	rc = qmckl_context_destroy(context);
-	free(elec_coord);
-	free(mo_vgl);
+	omp_target_free(elec_coord, DEVICE_ID);
+	omp_target_free(mo_vgl, DEVICE_ID);
 
 }
