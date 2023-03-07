@@ -34,6 +34,12 @@ int main(int argc, char** argv)
 		fprintf(stderr,"Syntax: %s FILE.    (FILEs are data/*.h5)\n", argv[0]);
 		exit(-1);
 	}
+	//Time of iitialization
+	gettimeofday(&timecheck, NULL);
+	start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
+
+
+
 	char* file_name = argv[1];
 	trexio_t* trexio_file = trexio_open(file_name, 'r', TREXIO_HDF5, &rc);
 	assert (rc == TREXIO_SUCCESS);
@@ -77,6 +83,13 @@ int main(int argc, char** argv)
 
 	rc = qmckl_set_electron_coord_device(context, 'N', walk_num, elec_coord_device, walk_num*elec_num*3);
 	assert (rc == QMCKL_SUCCESS);
+
+	gettimeofday(&timecheck, NULL);
+	end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
+	printf("Time for the initialisation (ms): %10.1f\n", (double) (end-start) );
+
+
+
 
 	rc = qmckl_get_ao_basis_ao_vgl_device(context, ao_vgl_device, size_max);
 	assert (rc == QMCKL_SUCCESS);
