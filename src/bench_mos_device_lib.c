@@ -2,7 +2,6 @@
 #include "config.h"
 #endif
 
-#include <qmckl.h>
 #include <qmckl_gpu.h>
 #include <trexio.h>
 #include <math.h>
@@ -90,7 +89,7 @@ int main(int argc, char** argv)
 	end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
 	printf("Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
-	rc = qmckl_context_destroy(context);
+	rc = qmckl_context_destroy_device(context);
 	omp_target_free(elec_coord, DEVICE_ID);
 	omp_target_free(mo_vgl, DEVICE_ID);
 
