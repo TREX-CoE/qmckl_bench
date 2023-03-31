@@ -21,6 +21,8 @@ const double jast_coef[11080] = {
 };
 
 
+
+
 int main(int argc, char** argv)
 {
   long start, end;
