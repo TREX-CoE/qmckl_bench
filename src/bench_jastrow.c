@@ -38,11 +38,14 @@ int main(int argc, char** argv)
   trexio_t* trexio_file = trexio_open(file_name, 'r', TREXIO_HDF5, &rc);
   assert (rc == TREXIO_SUCCESS);
 
-  int walk_num, elec_num;
+  int walk_num;
   rc = trexio_read_qmc_num(trexio_file, &walk_num);
   assert (rc == TREXIO_SUCCESS);
+
+  int elec_num;
   rc = trexio_read_electron_num(trexio_file, &elec_num);
   assert (rc == TREXIO_SUCCESS);
+
   double* elec_coord = malloc(sizeof(double)*walk_num*elec_num*3);
   assert (elec_coord != NULL);
   rc = trexio_read_qmc_point(trexio_file, elec_coord);
@@ -56,10 +59,18 @@ int main(int argc, char** argv)
   }
   assert (rc == QMCKL_SUCCESS);
 
+  int64_t nucl_num;
+  rc = qmckl_get_nucleus_num(context, &nucl_num);
+  assert (rc == TREXIO_SUCCESS);
+
   int64_t ao_num;
   rc = qmckl_get_ao_basis_ao_num(context, &ao_num);
   assert (rc == QMCKL_SUCCESS);
 
+  rc = qmckl_set_electron_coord(context, 'N', walk_num, elec_coord, walk_num*elec_num*3);
+  assert (rc == QMCKL_SUCCESS);
+
+/*
   const int64_t size_max = 5*walk_num*elec_num*ao_num;
   double * ao_vgl = malloc (size_max * sizeof(double));
   assert (ao_vgl != NULL);
@@ -69,65 +80,72 @@ int main(int argc, char** argv)
 
   rc = qmckl_get_ao_basis_ao_vgl(context, ao_vgl, size_max);
   assert (rc == QMCKL_SUCCESS);
+*/
 
-
-  rc = qmckl_set_electron_rescale_factor_en(context, 2.0);
-  assert(rc == QMCKL_SUCCESS);
-
-  rc = qmckl_set_electron_rescale_factor_ee(context, 2.0);
-  assert(rc == QMCKL_SUCCESS);
-
-  rc = qmckl_set_nucleus_rescale_factor (context, 2.0);
-  assert(rc == QMCKL_SUCCESS);
-
-
-  int64_t nucl_num;
   const int64_t aord_num = 5;
   const int64_t bord_num = 5;
   const int64_t cord_num = 5;
   const int64_t type_nucl_num = 1;
 
-  rc = qmckl_get_nucleus_num(context, &nucl_num);
 
   assert(rc == QMCKL_SUCCESS);
 
-  rc = qmckl_set_jastrow_ord_num(context, aord_num, bord_num, cord_num);
+  rc = qmckl_set_jastrow_champ_aord_num(context, aord_num);
   assert(rc == QMCKL_SUCCESS);
 
-  rc = qmckl_set_jastrow_type_nucl_num(context, type_nucl_num);
+  rc = qmckl_set_jastrow_champ_bord_num(context, bord_num);
   assert(rc == QMCKL_SUCCESS);
+
+  rc = qmckl_set_jastrow_champ_cord_num(context, cord_num);
+  assert(rc == QMCKL_SUCCESS);
+
+  rc = qmckl_set_jastrow_champ_type_nucl_num(context, type_nucl_num);
+  assert(rc == QMCKL_SUCCESS);
+
+
+  double nucl_rescale[type_nucl_num];
+  for (int64_t i=0 ; i<type_nucl_num ; ++i) {
+     nucl_rescale[i] = 2.0;
+  }
+  rc = qmckl_set_jastrow_champ_rescale_factor_en(context, &(nucl_rescale[0]), type_nucl_num);
+  assert(rc == QMCKL_SUCCESS);
+
+  rc = qmckl_set_jastrow_champ_rescale_factor_ee(context, 2.0);
+  assert(rc == QMCKL_SUCCESS);
+
 
   int64_t* type_nucl_vector = malloc(nucl_num * sizeof(int64_t));
   for (int i=0 ; i<nucl_num; ++i) type_nucl_vector[i] = 1;
-  rc = qmckl_set_jastrow_type_nucl_vector(context, type_nucl_vector, nucl_num);
+  rc = qmckl_set_jastrow_champ_type_nucl_vector(context, type_nucl_vector, nucl_num);
   assert(rc == QMCKL_SUCCESS);
   free(type_nucl_vector);
 
   const double* aord_vector = &(jast_coef[0]);
-  rc = qmckl_set_jastrow_aord_vector(context, aord_vector, 11080);
+  rc = qmckl_set_jastrow_champ_a_vector(context, aord_vector, 11080);
   assert(rc == QMCKL_SUCCESS);
 
   const double* bord_vector = &(jast_coef[1]);
-  rc = qmckl_set_jastrow_bord_vector(context, bord_vector, 11079);
+  rc = qmckl_set_jastrow_champ_b_vector(context, bord_vector, 11079);
   assert(rc == QMCKL_SUCCESS);
 
   const double* cord_vector = &(jast_coef[2]);
-  rc = qmckl_set_jastrow_cord_vector(context, cord_vector, 11078);
+  rc = qmckl_set_jastrow_champ_c_vector(context, cord_vector, 11078);
   assert(rc == QMCKL_SUCCESS);
 
 
-  double factor_een_deriv_e[walk_num][5][elec_num];
+  double jast_gl[walk_num][4][elec_num];
 
   gettimeofday(&timecheck, NULL);
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
   for (int i=0 ; i<ITERMAX ; ++i) {
     rc = qmckl_context_touch(context);
-    rc = qmckl_get_jastrow_factor_een_deriv_e(context, &(factor_een_deriv_e[0][0][0]), walk_num*elec_num*5);
+    rc = qmckl_get_jastrow_champ_gl(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
   }
   gettimeofday(&timecheck, NULL);
   end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
   printf("Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
 
+  free(elec_coord);
 
 }
