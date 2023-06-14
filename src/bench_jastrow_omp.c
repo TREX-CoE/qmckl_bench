@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
 		context, type_nucl_vector_device, type_nucl_vector,
 		nucl_num * sizeof(int64_t)
 	);
-	rc = qmckl_set_jastrow_type_nucl_vector_device(context, type_nucl_vector,
+	rc = qmckl_set_jastrow_type_nucl_vector_device(context, type_nucl_vector_device,
 												  nucl_num);
 	assert(rc == QMCKL_SUCCESS_DEVICE);
 	free(type_nucl_vector);
@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
 		context, aord_vector_device, aord_vector,
 		11080 * sizeof(double)
 	);
-	rc = qmckl_set_jastrow_a_vector_device(context, aord_vector, 11080);
+	rc = qmckl_set_jastrow_a_vector_device(context, aord_vector_device, 11080);
 	assert(rc == QMCKL_SUCCESS_DEVICE);
 
 	const double *bord_vector = &(jast_coef[1]);
