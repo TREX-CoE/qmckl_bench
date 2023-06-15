@@ -1,71 +1,26 @@
-#+TITLE: Performance tests for QMCkl.
+#+TITLE: Performance tests for QMCkl GPU
+
+*Note* : This branch is for the GPU version of QMCkl only, which can be found [[https://github.com/TREX-CoE/qmckl_gpu][here]] .
 
 * Installation
 
-1. Download and install QMCkl
-2. Compile the current tests and run
+1. Download and install QMCkl GPU and TREXio
+2. Configure the benches :
 
 #+begin_src  bash
 ./autogen.sh
 ./configure
+#+end_src
+
+You might need some additional flags to configure the build to your liking. Those options are similar to those of QMCkl GPU itself :
+
+- ~--with-qmckl_gpu=...~ : if autoconf doesn't find QMCkl GPU, you need to specify its path. This directory should contain ~lib/~ and ~include/~ subdirectories.
+- ~--enable-[omp|acc]~ : by default, benchmarks are built for OpenMP, but the version to build can be explicitely specified.
+- ~--disable-autoflags~ : based on the compiler, the configure will try some default flags to enable offload. In case they do not work, you can disable those automatic flags and specify the manually in the ~CFLAGS~ variable.
+
+3. Compile and run them :
+
+#+begin_src  bash
 make
 ./bench_jastrow
 #+end_src
-
-* Results
-
-** CPU
-  Intel(R) Xeon(R) CPU E3-1271 v3 @ 3.60GHz, 4cores
-
-** GNU options for QMCkl
-
-  #+begin_src bash
-./configure \
-    CC=gcc \
-    CFLAGS="-g -O2 -ffast-math  -march=native  -flto -fno-trapping-math -fno-math-errno -ftree-vectorize -fno-stack-protector" \
-    FC=gfortran \
-    FCFLAGS="-g -O2 -fstack-arrays -ffast-math -march=native  -flto -ftree-vectorize -fno-stack-protector" \
-    --enable-hpc --with-openmp --enable-static
-
-  #+end_src
-
-
-** Intel options for QMCkl
-
-  #+begin_src bash
-./configure --with-icc --with-ifort --enable-hpc --with-openmp --enable-static
-
-# -xHost -ip -Ofast -ftz -finline -g -mkl=sequential -fopenmp
-  #+end_src
-
-** Clang options for QMCkl
-
-  #+begin_src bash
-./configure \
-    CC=clang \
-    CFLAGS="-Ofast -g -march=native" \
-    FC=flang  \
-    FCFLAGS="-Ofast -g -march=native" \
-    --enable-hpc --with-openmp --enable-static
-
-  #+end_src
-
-
-** Measures
-
-|-----+--------------+----------------+-----------------------+----------------+-----------------------|
-| HPC | Compiler     | bench_aos (ms) | bench_aos OpenMP (ms) | bench_mos (ms) | bench_mos OpenMP (ms) |
-|-----+--------------+----------------+-----------------------+----------------+-----------------------|
-| No  | GCC-8        |          112.7 |                 113.1 |         2036.1 |                2038.7 |
-|-----+--------------+----------------+-----------------------+----------------+-----------------------|
-| Yes | GCC-8        |           68.0 |                  24.8 |          896.2 |                 250.3 |
-| Yes | Intel-2021.5 |           60.5 |                  24.1 |          890.0 |                 231.6 |
-|-----+--------------+----------------+-----------------------+----------------+-----------------------|
-
-** Memo
-
-   Run MAQAO with
-
-   #+begin_src bash
-maqao oneview --create-report=three --output-format=html --force-all-loops --external-libraries={\"libqmckl.so.0\"} -- ./bench_aos data/Alz_small.h5
-   #+end_src
