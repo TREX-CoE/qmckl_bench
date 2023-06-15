@@ -4,23 +4,18 @@
 
 * Installation
 
-1. Download and install QMCkl GPU and TREXio
-2. Configure the benches :
-
-#+begin_src  bash
-./autogen.sh
-./configure
-#+end_src
-
-You might need some additional flags to configure the build to your liking. Those options are similar to those of QMCkl GPU itself :
-
-- ~--with-qmckl_gpu=...~ : if autoconf doesn't find QMCkl GPU, you need to specify its path. This directory should contain ~lib/~ and ~include/~ subdirectories.
-- ~--enable-[omp|acc]~ : by default, benchmarks are built for OpenMP, but the version to build can be explicitely specified.
-- ~--disable-autoflags~ : based on the compiler, the configure will try some default flags to enable offload. In case they do not work, you can disable those automatic flags and specify the manually in the ~CFLAGS~ variable.
-
-3. Compile and run them :
-
-#+begin_src  bash
-make
-./bench_jastrow
-#+end_src
+- Download and install QMCkl GPU and TREXio
+- Configure the benches :
+  #+begin_src  bash
+  ./autogen.sh
+  ./configure
+  #+end_src
+  You might need some additional flags to configure the build to your liking. Those options are similar to those of QMCkl GPU itself :
+  - ~--with-qmckl_gpu=...~ : if autoconf doesn't find QMCkl GPU by itself, you need to specify its path. This directory should contain ~lib/~ and ~include/~ subdirectories.
+  - ~--enable-[omp|acc]~ : by default, benchmarks are built for OpenMP, but the version to build can be explicitely specified.
+  - ~--disable-autoflags~ : based on the compiler, the configure will try some default flags to enable offload. In case they do not work, you can disable those automatic flags and specify them manually in the ~CFLAGS~ variable. Compilers supported out of the box for autoflags are gcc, clang and nvc.
+- Compile and run them :
+  #+begin_src  bash
+  make
+  ./bench_[aos|mos|jastrow] data/[...]
+  #+end_src
