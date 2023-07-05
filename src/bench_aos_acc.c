@@ -2,7 +2,6 @@
 #include "config.h"
 #endif
 
-#include <qmckl.h>
 #include <qmckl_gpu.h>
 #include <trexio.h>
 #include <math.h>
