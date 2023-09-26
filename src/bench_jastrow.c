@@ -126,6 +126,9 @@ int main(int argc, char** argv)
   rc = qmckl_set_jastrow_champ_c_vector(context, c_vector, 11080);
   assert(rc == QMCKL_SUCCESS);
 
+  rc = qmckl_set_jastrow_champ_spin_independent(context, false);
+  assert(rc == QMCKL_SUCCESS);
+
 
   {
     double jast_val[walk_num];
