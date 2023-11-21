@@ -32,7 +32,8 @@ int main(int argc, char **argv) {
 	}
 	acc_init(device_type);
 
-	context = qmckl_context_create_device(0);	qmckl_exit_code_device rc;
+	context = qmckl_context_create_device(0);
+	qmckl_exit_code_device rc;
 
 	if (argc < 2) {
 		fprintf(stderr, "Syntax: %s FILE.    (FILEs are data/*.h5)\n", argv[0]);
