@@ -34,9 +34,9 @@ int main(int argc, char** argv)
   assert (rc == TREXIO_SUCCESS);
 
   int walk_num, elec_num;
-  rc = trexio_read_qmc_num(trexio_file, &walk_num);
-  assert (rc == TREXIO_SUCCESS);
   rc = trexio_read_electron_num(trexio_file, &elec_num);
+  assert (rc == TREXIO_SUCCESS);
+  rc = trexio_read_qmc_num(trexio_file, &walk_num);
   assert (rc == TREXIO_SUCCESS);
   double* elec_coord = malloc(sizeof(double)*walk_num*elec_num*3);
   assert (elec_coord != NULL);
@@ -80,6 +80,8 @@ int main(int argc, char** argv)
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
   rc = qmckl_get_mo_basis_mo_value(context, mo_vgl, size_max);
+  assert (rc == QMCKL_SUCCESS);
+
   for (int i=0 ; i<ITERMAX ; ++i) {
     rc = qmckl_get_mo_basis_mo_value_inplace(context, mo_vgl, size_max);
   }
