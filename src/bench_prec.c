@@ -14,8 +14,8 @@
 
 #include <time.h>
 
-#define ITERMAX_AO 100
-#define ITERMAX_MO 100
+#define ITERMAX_AO 50
+#define ITERMAX_MO 10
 
 int main(int argc, char** argv)
 {
