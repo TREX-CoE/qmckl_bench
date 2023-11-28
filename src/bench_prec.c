@@ -46,10 +46,10 @@ int main(int argc, char** argv)
   assert (rc == TREXIO_SUCCESS);
   trexio_close(trexio_file);
 
-  printf("Reading %s.\n", file_name);
+  printf("# Reading %s.\n", file_name);
   rc = qmckl_trexio_read(context, file_name, 255);
   if (rc != QMCKL_SUCCESS) {
-    printf("%s\n", qmckl_string_of_error(rc));
+    fprintf(stderr, "%s\n", qmckl_string_of_error(rc));
   }
   assert (rc == QMCKL_SUCCESS);
 
@@ -93,6 +93,7 @@ int main(int argc, char** argv)
     end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
     printf("%2d : %10.1f  ", precision, (double) (end-start) / (double) ITERMAX_AO);
+    fflush(stdout);
 
     gettimeofday(&timecheck, NULL);
     start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
@@ -107,6 +108,7 @@ int main(int argc, char** argv)
     end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
     printf("%10.1f  ", (double) (end-start) / (double) ITERMAX_AO);
+    fflush(stdout);
 
     for (int i=0 ; i<ITERMAX_MO ; ++i) {
       rc = qmckl_get_mo_basis_mo_vgl_inplace(context, mo_vgl, size_max_mo);
@@ -115,6 +117,7 @@ int main(int argc, char** argv)
     end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
     printf("%10.1f  ", (double) (end-start) / (double) ITERMAX_MO);
+    fflush(stdout);
 
     gettimeofday(&timecheck, NULL);
     start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
@@ -130,6 +133,7 @@ int main(int argc, char** argv)
 
     printf("%10.1f  ", (double) (end-start) / (double) ITERMAX_MO);
     printf("\n");
+    fflush(stdout);
   }
 
   rc = qmckl_context_destroy(context);
