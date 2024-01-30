@@ -14,7 +14,7 @@
 
 #include <time.h>
 
-#define ITERMAX 10
+#define ITERMAX 3
 
 int main(int argc, char** argv)
 {

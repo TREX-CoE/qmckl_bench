@@ -17,7 +17,7 @@ make
 ** CPU
   Intel(R) Xeon(R) CPU E3-1271 v3 @ 3.60GHz, 4cores
 
-** GNU options for QMCkl
+** GNU options for QMCkl on x86
 
   #+begin_src bash
 ./configure \
@@ -29,6 +29,17 @@ make
 
   #+end_src
 
+** GNU options for QMCkl on ARM
+
+  #+begin_src bash
+./configure \
+    CC=gcc \
+    CFLAGS="-g -mcpu=native -fno-signaling-nans -fno-trapping-math -freciprocal-math -fno-signed-zeros -fno-math-errno -ffinite-math-only -funroll-loops -O3 -ftree-vectorize -flto -fopenmp-simd" \
+    FC=gfortran \
+    FCFLAGS="-g -mcpu=native  -O2 -fstack-arrays -ffast-math -flto -ftree-vectorize -fno-stack-protector" \
+    --enable-hpc --with-openmp --enable-static
+
+  #+end_src
 
 ** Intel options for QMCkl
 
