@@ -176,7 +176,7 @@ int main(int argc, char** argv)
 */
   }
 
-  rc = qmckl_context_destroy(context);
+//  rc = qmckl_context_destroy(context);
 
   free(elec_coord);
 

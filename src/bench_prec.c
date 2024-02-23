@@ -69,8 +69,8 @@ int main(int argc, char** argv)
   double * mo_vgl = malloc (size_max_mo * sizeof(double));
   assert (mo_vgl != NULL);
 
-//  { int precision = 20;
-  for (int precision=2 ; precision < 54 ; precision++) {
+  { int precision = 16;
+//  for (int precision=2 ; precision < 54 ; precision++) {
 
     qmckl_set_numprec_precision(context, precision);
 

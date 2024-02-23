@@ -68,6 +68,12 @@ int main(int argc, char** argv)
   gettimeofday(&timecheck, NULL);
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
+  size_t icount = 0;
+  for (int i=0 ; i<size_max ; ++i) {
+     if (ao_vgl[i] != 0.) icount++;
+  }
+  printf("Non-zeros = %f %%\n", 100. * (double) icount / (double) size_max);
+
   for (int i=0 ; i<ITERMAX ; ++i) {
     rc = qmckl_get_ao_basis_ao_vgl_inplace(context, ao_vgl, size_max);
   }
@@ -81,6 +87,12 @@ int main(int argc, char** argv)
 
   rc = qmckl_get_ao_basis_ao_value(context, ao_vgl, size_max);
   assert (rc == QMCKL_SUCCESS);
+
+  icount = 0;
+  for (int i=0 ; i<size_max/5 ; ++i) {
+     if (ao_vgl[i] != 0.) icount++;
+  }
+  printf("Non-zeros = %f %%\n", 100. * (double) icount / (double) (size_max/5));
 
   for (int i=0 ; i<ITERMAX ; ++i) {
     rc = qmckl_get_ao_basis_ao_value_inplace(context, ao_vgl, size_max);
