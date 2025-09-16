@@ -135,6 +135,11 @@ int main(int argc, char** argv)
   assert(rc == QMCKL_SUCCESS);
 
 
+  walk_num = 1;
+  rc = qmckl_set_electron_coord(context, 'N', walk_num, elec_coord, walk_num*elec_num*3);
+  assert (rc == QMCKL_SUCCESS);
+
+
   {
     double jast_val[walk_num];
 
@@ -190,12 +195,16 @@ int main(int argc, char** argv)
     printf("\n");
     free(een_rescaled_n);
 
+    rc = qmckl_get_jastrow_champ_value(context, jast_val, walk_num);
     gettimeofday(&timecheck, NULL);
     start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
     for (int i=0 ; i<ITERMAX ; ++i) {
       printf("%3d / %3d\n", i, ITERMAX);
       rc = qmckl_context_touch(context);
-      rc = qmckl_get_jastrow_champ_value(context, jast_val, walk_num);
+      for (int j=0 ; j<elec_num ; ++j) {
+        rc = qmckl_set_single_point(context, 'N', j, elec_coord, 3);
+        rc = qmckl_get_jastrow_champ_single_een(context, jast_val, walk_num);
+      }
     }
     gettimeofday(&timecheck, NULL);
     end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
@@ -211,12 +220,16 @@ int main(int argc, char** argv)
 
   {
     double jast_gl[walk_num][4][elec_num];
+    rc = qmckl_get_jastrow_champ_gl(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
     gettimeofday(&timecheck, NULL);
     start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
     for (int i=0 ; i<ITERMAX ; ++i) {
       printf("%3d / %3d\n", i, ITERMAX);
       rc = qmckl_context_touch(context);
-      rc = qmckl_get_jastrow_champ_gl(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
+      for (int j=0 ; j<elec_num ; ++j) {
+        rc = qmckl_set_single_point(context, 'N', j, elec_coord, 3);
+        rc = qmckl_get_jastrow_champ_single_een_gl(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
+      };
     }
     gettimeofday(&timecheck, NULL);
     end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
