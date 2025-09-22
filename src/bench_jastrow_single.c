@@ -14,7 +14,7 @@
 
 #include <time.h>
 
-#define ITERMAX 10
+#define ITERMAX 40
 #define PRECISION 24
 
 const double kappa = 2.0;
@@ -214,6 +214,35 @@ int main(int argc, char** argv)
 /*
     for (int i=0 ; i<walk_num ; ++i) {
       printf("%d %e\n", i, jast_val[i]);
+    }
+*/
+  }
+  return 0;
+
+  {
+    double jast_gl[walk_num][4][elec_num];
+    rc = qmckl_get_jastrow_champ_gl(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
+    gettimeofday(&timecheck, NULL);
+    start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
+    for (int i=0 ; i<ITERMAX ; ++i) {
+      printf("%3d / %3d\n", i, ITERMAX);
+      rc = qmckl_context_touch(context);
+      for (int j=0 ; j<elec_num ; ++j) {
+        rc = qmckl_set_single_point(context, 'N', j, elec_coord, 3);
+        rc = qmckl_get_jastrow_champ_single_een_g(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
+      };
+    }
+    gettimeofday(&timecheck, NULL);
+    end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
+
+    printf("GL: Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
+/*
+    for (int i=0 ; i<walk_num ; ++i) {
+      for (int j=0 ; j<4 ; ++j) {
+        for (int k=0 ; k<elec_num ; ++k) {
+          printf("%d %d %d %e\n", i, j, k, jast_gl[i][j][k]);
+        }
+      }
     }
 */
   }
