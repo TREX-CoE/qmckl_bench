@@ -146,56 +146,29 @@ int main(int argc, char** argv)
     rc = qmckl_get_jastrow_champ_value(context, jast_val, walk_num);
     assert(rc == QMCKL_SUCCESS);
 
-    int64_t i_in, i_tot, sze;
-    double eps = qmckl_get_numprec_epsilon(context);
-
-    sze = elec_num*elec_num*walk_num*(cord_num+1);
-    double* een_rescaled_e = calloc(sizeof(double),sze);
-    rc = qmckl_get_jastrow_champ_een_rescaled_e(context, een_rescaled_e, sze);
-    printf("Density ee:\n");
-    for (int k=0 ; k<=cord_num ; ++k) {
-      i_in = 0;
-      i_tot = 0;
-      for (int w=0 ; w<walk_num ; ++w) {
-        for (int i=0 ; i<elec_num ; ++i) {
-          for (int j=0 ; j<elec_num ; ++j) {
-            double x = een_rescaled_e[j+elec_num*(i+elec_num*(k+(cord_num+1)*w))];
-            if (x > eps) {
-              i_in++;
-            }
-            i_tot++;
-          }
-        }
+    gettimeofday(&timecheck, NULL);
+    start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
+    for (int i=0 ; i<ITERMAX ; ++i) {
+      printf("%3d / %3d\n", i, ITERMAX);
+      rc = qmckl_context_touch(context);
+      for (int j=0 ; j<elec_num ; ++j) {
+        rc = qmckl_set_single_point(context, 'N', j, elec_coord, 3);
+        rc = qmckl_get_jastrow_champ_single_een(context, jast_val, walk_num, 'd');
       }
-      printf("%10.4f %%  ", (double) 100*i_in / (double) i_tot);
     }
-    printf("\n");
-    free(een_rescaled_e);
+    gettimeofday(&timecheck, NULL);
+    end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
-    sze = elec_num*nucl_num*walk_num*(cord_num+1);
-    double* een_rescaled_n = calloc(sizeof(double),sze);
-    rc = qmckl_get_jastrow_champ_een_rescaled_n(context, een_rescaled_n, sze);
-    printf("Density eN:\n");
-    for (int k=0 ; k<=cord_num ; ++k) {
-      i_in = 0;
-      i_tot = 0;
-      for (int w=0 ; w<walk_num ; ++w) {
-        for (int i=0 ; i<nucl_num ; ++i) {
-          for (int j=0 ; j<elec_num ; ++j) {
-            double x = een_rescaled_n[j+elec_num*(i+nucl_num*(k+(cord_num+1)*w))];
-            if (x > eps) {
-              i_in++;
-            }
-            i_tot++;
-          }
-        }
-      }
-      printf("%10.4f %%  ", (double) 100*i_in / (double) i_tot);
-    }
-    printf("\n");
-    free(een_rescaled_n);
+    printf("Doc:  %10.1f\n", (double) (end-start) / (double) ITERMAX);
+
+  }
+
+  {
+    double jast_val[walk_num];
 
     rc = qmckl_get_jastrow_champ_value(context, jast_val, walk_num);
+    assert(rc == QMCKL_SUCCESS);
+
     gettimeofday(&timecheck, NULL);
     start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
     for (int i=0 ; i<ITERMAX ; ++i) {
@@ -203,24 +176,22 @@ int main(int argc, char** argv)
       rc = qmckl_context_touch(context);
       for (int j=0 ; j<elec_num ; ++j) {
         rc = qmckl_set_single_point(context, 'N', j, elec_coord, 3);
-        rc = qmckl_get_jastrow_champ_single_een(context, jast_val, walk_num);
+        rc = qmckl_get_jastrow_champ_single_een(context, jast_val, walk_num, 'f');
       }
     }
     gettimeofday(&timecheck, NULL);
     end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
-    printf("Value: Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
+    printf("Fortran:  %10.1f\n", (double) (end-start) / (double) ITERMAX);
 
-/*
-    for (int i=0 ; i<walk_num ; ++i) {
-      printf("%d %e\n", i, jast_val[i]);
-    }
-*/
   }
 
   {
-    double jast_gl[walk_num][4][elec_num];
-    rc = qmckl_get_jastrow_champ_gl(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
+    double jast_val[walk_num];
+
+    rc = qmckl_get_jastrow_champ_value(context, jast_val, walk_num);
+    assert(rc == QMCKL_SUCCESS);
+
     gettimeofday(&timecheck, NULL);
     start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
     for (int i=0 ; i<ITERMAX ; ++i) {
@@ -228,53 +199,18 @@ int main(int argc, char** argv)
       rc = qmckl_context_touch(context);
       for (int j=0 ; j<elec_num ; ++j) {
         rc = qmckl_set_single_point(context, 'N', j, elec_coord, 3);
-        rc = qmckl_get_jastrow_champ_single_een_g(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
-      };
+        rc = qmckl_get_jastrow_champ_single_een(context, jast_val, walk_num, 'c');
+      }
     }
     gettimeofday(&timecheck, NULL);
     end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
-    printf("GL: Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
-/*
-    for (int i=0 ; i<walk_num ; ++i) {
-      for (int j=0 ; j<4 ; ++j) {
-        for (int k=0 ; k<elec_num ; ++k) {
-          printf("%d %d %d %e\n", i, j, k, jast_gl[i][j][k]);
-        }
-      }
-    }
-*/
+    printf("C:  %10.1f\n", (double) (end-start) / (double) ITERMAX);
+
   }
 
-  {
-    double jast_gl[walk_num][4][elec_num];
-    rc = qmckl_get_jastrow_champ_gl(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
-    gettimeofday(&timecheck, NULL);
-    start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
-    for (int i=0 ; i<ITERMAX ; ++i) {
-      printf("%3d / %3d\n", i, ITERMAX);
-      rc = qmckl_context_touch(context);
-      for (int j=0 ; j<elec_num ; ++j) {
-        rc = qmckl_set_single_point(context, 'N', j, elec_coord, 3);
-        rc = qmckl_get_jastrow_champ_single_een_gl(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
-      };
-    }
-    gettimeofday(&timecheck, NULL);
-    end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
-    printf("GL: Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
-/*
-    for (int i=0 ; i<walk_num ; ++i) {
-      for (int j=0 ; j<4 ; ++j) {
-        for (int k=0 ; k<elec_num ; ++k) {
-          printf("%d %d %d %e\n", i, j, k, jast_gl[i][j][k]);
-        }
-      }
-    }
-*/
-  }
-
-//  rc = qmckl_context_destroy(context);
+  rc = qmckl_context_destroy(context);
 
   free(elec_coord);
 
