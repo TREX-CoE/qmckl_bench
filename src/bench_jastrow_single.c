@@ -14,7 +14,7 @@
 
 #include <time.h>
 
-#define ITERMAX 40
+#define ITERMAX 10
 #define PRECISION 24
 
 const double kappa = 2.0;
@@ -217,7 +217,6 @@ int main(int argc, char** argv)
     }
 */
   }
-  return 0;
 
   {
     double jast_gl[walk_num][4][elec_num];
