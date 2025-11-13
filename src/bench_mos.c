@@ -58,24 +58,24 @@ walk_num = 20;
   rc = qmckl_get_mo_basis_mo_num(context, &mo_num);
   assert (rc == QMCKL_SUCCESS);
 
-//  const int64_t size_max = 5*walk_num*elec_num*mo_num;
-  const int64_t size_max = 3*3*nucl_num*walk_num*elec_num*mo_num;
+  const int64_t size_max = 5*walk_num*elec_num*mo_num;
+//  const int64_t size_max = 3*3*nucl_num*walk_num*elec_num*mo_num;
   double * mo_vgl = malloc (size_max * sizeof(double));
   assert (mo_vgl != NULL);
 
   rc = qmckl_set_electron_coord(context, 'N', walk_num, elec_coord, walk_num*elec_num*3);
   assert (rc == QMCKL_SUCCESS);
 
-//  rc = qmckl_get_mo_basis_mo_vgl(context, mo_vgl, size_max);
-  rc = qmckl_get_forces_mo_g(context, mo_vgl, size_max);
+  rc = qmckl_get_mo_basis_mo_vgl(context, mo_vgl, size_max);
+//  rc = qmckl_get_forces_mo_g(context, mo_vgl, size_max);
   assert (rc == QMCKL_SUCCESS);
 
   gettimeofday(&timecheck, NULL);
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
   for (int i=0 ; i<ITERMAX ; ++i) {
-//    rc = qmckl_get_mo_basis_mo_vgl_inplace(context, mo_vgl, size_max);
-    rc = qmckl_get_forces_mo_g_inplace(context, mo_vgl, size_max);
+    rc = qmckl_get_mo_basis_mo_vgl_inplace(context, mo_vgl, size_max);
+//    rc = qmckl_get_forces_mo_g_inplace(context, mo_vgl, size_max);
 //    rc = qmckl_get_forces_mo_g(context, mo_vgl, size_max);
   }
   gettimeofday(&timecheck, NULL);
@@ -83,7 +83,6 @@ walk_num = 20;
 
   printf("Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
 
-  /*
   gettimeofday(&timecheck, NULL);
   start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
@@ -97,7 +96,6 @@ walk_num = 20;
   end = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
 
   printf("Time for the calculation of 1 step (ms): %10.1f\n", (double) (end-start) / (double) ITERMAX);
-  */
   rc = qmckl_context_destroy(context);
   free(elec_coord);
   free(mo_vgl);
