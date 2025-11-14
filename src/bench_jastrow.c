@@ -14,7 +14,7 @@
 
 #include <time.h>
 
-#define ITERMAX 10
+#define ITERMAX 4
 #define PRECISION 24
 
 const double kappa = 2.0;
@@ -190,6 +190,8 @@ int main(int argc, char** argv)
     printf("\n");
     free(een_rescaled_n);
 
+    rc = qmckl_context_touch(context);
+    rc = qmckl_get_jastrow_champ_value(context, jast_val, walk_num);
     gettimeofday(&timecheck, NULL);
     start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
     for (int i=0 ; i<ITERMAX ; ++i) {
@@ -212,6 +214,8 @@ int main(int argc, char** argv)
   {
     double jast_gl[walk_num][4][elec_num];
     gettimeofday(&timecheck, NULL);
+    rc = qmckl_context_touch(context);
+    rc = qmckl_get_jastrow_champ_gl(context, &(jast_gl[0][0][0]), walk_num*elec_num*4);
     start = (long)timecheck.tv_sec * 1000 + (long)timecheck.tv_usec / 1000;
     for (int i=0 ; i<ITERMAX ; ++i) {
       printf("%3d / %3d\n", i, ITERMAX);
